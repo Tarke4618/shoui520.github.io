@@ -4,49 +4,37 @@ on:
     branches:
       - master
       - main
-  workflow_dispatch: # Add this line to allow manual triggering
+  workflow_dispatch:
 
 jobs:
-  deploy_and_archive: # Renamed job for clarity
+  deploy_and_archive:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4 # Use a more recent version
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v5 # Use a more recent version
+        uses: actions/setup-python@v5
         with:
           python-version: 3.x
 
       - name: Install MkDocs and dependencies
         run: |
-          # IMPORTANT: Use the dependencies from the actual mkdocs.yml for accuracy!
-          # The original mkdocs.yml from shoui520/shoui520.github.io lists:
-          # mkdocs-material (provides search)
-          # mkdocs-minify-plugin
-          # mkdocs-redirects
-          # mkdocs-git-revision-date-localized-plugin
-          # The 'mkdocs-open-in-new-tab' might be an older requirement or specific to their CI
-          pip install mkdocs mkdocs-material mkdocs-minify-plugin mkdocs-redirects mkdocs-git-revision-date-localized-plugin
+          pip install mkdocs mkdocs-material mkdocs-minify-plugin mkdocs-redirects mkdocs-git-revision-date-localized-plugin mkdocs-open-in-new-tab
 
       - name: Build MkDocs site
-        run: mkdocs build # Explicitly build to ensure 'site' directory exists
+        run: mkdocs build
 
       - name: Archive the site directory
         run: |
           tar -czvf learnjapanese-moe-offline.tar.gz -C site .
-          # Alternatively, for a .zip file:
-          # (cd site && zip -r ../learnjapanese-moe-offline.zip .)
 
       - name: Upload artifact for download
         uses: actions/upload-artifact@v4
         with:
           name: learnjapanese-moe-offline-site
-          path: learnjapanese-moe-offline.tar.gz # Or learnjapanese-moe-offline.zip if you used zip
+          path: learnjapanese-moe-offline.tar.gz
           retention-days: 7
 
-      - name: Deploy to GitHub Pages (optional, keep if you want your fork to also deploy)
+      - name: Deploy to GitHub Pages (optional)
         run: mkdocs gh-deploy --force --clean
-        # The --clean flag is good practice.
-        # You might want to remove this step if you *only* want the archive
-        # and don't intend to host your fork on GitHub Pages.
