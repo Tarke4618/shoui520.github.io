@@ -4,6 +4,8 @@ site_url: https://learnjapanese.moe
 site_author: shoui  
 repo_url: https://github.com/shoui520/shoui520.github.io
 repo_name: Open a pull request
+# At the top level of your mkdocs.yml
+use_directory_urls: false
 nav:
   - Home: 'index.md'
   - 'Guides':
