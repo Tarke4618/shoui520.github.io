@@ -1,0 +1,39 @@
+name: Build Offline Site Archive
+
+on:
+  workflow_dispatch: # Allows manual triggering from the Actions tab
+
+jobs:
+  build_and_archive:
+    runs-on: ubuntu-latest # Use a Linux runner
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4 # Fetches your repository code
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x' # Use a recent Python 3 version
+
+      - name: Install MkDocs and dependencies
+        run: |
+          pip install mkdocs mkdocs-material mkdocs-minify-plugin mkdocs-redirects mkdocs-git-revision-date-localized-plugin
+          # Add any other plugins if you find they are needed by looking at the original repo's mkdocs.yml
+
+      - name: Build MkDocs site
+        run: mkdocs build # This creates the 'site' directory
+
+      - name: Archive the site directory
+        run: |
+          tar -czvf learnjapanese-moe-offline.tar.gz -C site .
+          # Alternatively, for a .zip file:
+          # (cd site && zip -r ../learnjapanese-moe-offline.zip .)
+
+      - name: Upload artifact for download
+        uses: actions/upload-artifact@v4
+        with:
+          name: learnjapanese-moe-offline-site # Name of the artifact
+          path: learnjapanese-moe-offline.tar.gz # Path to the file to upload
+          # If you used zip:
+          # path: learnjapanese-moe-offline.zip
+          retention-days: 7 # Optional: How long to keep the artifact (default 90 days for public repos)
